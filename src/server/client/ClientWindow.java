@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 public class ClientWindow extends JFrame {
@@ -79,30 +78,19 @@ public class ClientWindow extends JFrame {
         btnLogin.addActionListener(
                 e -> {
                     if (isLoggedIn() && isServerStarted(serverWindow)) {
-                        loadChatArea();
+                        serverWindow.sendMessage(login.getText() + " подключился к беседе.");
+                        serverWindow.loadChatArea();
                         chat.setVisible(true);
                     }
                 }
         );
 
         message.addActionListener(
-                e -> {
-                    if (isLoggedIn() && !message.getText().isEmpty() && isServerStarted(serverWindow)) {
-                        sendMessage();
-                        message.setText("");
-                        serverWindow.loadChatArea();
-                    }
-                }
+                e -> attemptToSendMessage(serverWindow)
         );
 
         btnSend.addActionListener(
-                e -> {
-                    if (isLoggedIn() && !message.getText().isEmpty() && isServerStarted(serverWindow)) {
-                        sendMessage();
-                        message.setText("");
-                        serverWindow.loadChatArea();
-                    }
-                }
+                e -> attemptToSendMessage(serverWindow)
         );
 
         setVisible(true);
@@ -116,17 +104,11 @@ public class ClientWindow extends JFrame {
         return !login.getText().isEmpty() && !password.getText().isEmpty() && !ip.getText().isEmpty() && !port.getText().isEmpty();
     }
 
-    public void sendMessage() {
-        try {
-            FileWriter writer = new FileWriter("chatHistory.txt", true);
-
-            writer.write(login.getText() + ": " + message.getText());
-            writer.write("\n");
-
-            writer.close();
-
-        } catch (IOException e) {
-            System.out.println("Возникла ошибка во время записи в файл");
+    private void attemptToSendMessage(ServerWindow serverWindow) {
+        if (isLoggedIn() && !message.getText().isEmpty() && isServerStarted(serverWindow)) {
+            serverWindow.sendMessage(login.getText() + ": " + message.getText());
+            message.setText("");
+            serverWindow.loadChatArea();
         }
     }
 

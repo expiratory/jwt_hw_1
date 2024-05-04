@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class ServerWindow extends JFrame {
@@ -49,6 +50,7 @@ public class ServerWindow extends JFrame {
 
         btnStart.addActionListener(
                 e -> {
+                    sendMessage("Сервер запущен!");
                     loadChatArea();
                     chat.setVisible(true);
                     serverStarted = true;
@@ -56,12 +58,27 @@ public class ServerWindow extends JFrame {
         );
         btnStop.addActionListener(
                 e -> {
+                    sendMessage("Сервер остановлен!");
                     chat.setVisible(false);
                     serverStarted = false;
                 }
         );
 
         setVisible(true);
+    }
+
+    public void sendMessage(String message) {
+        try {
+            FileWriter writer = new FileWriter("chatHistory.txt", true);
+
+            writer.write(message);
+            writer.write("\n");
+
+            writer.close();
+
+        } catch (IOException e) {
+            System.out.println("Возникла ошибка во время записи в файл");
+        }
     }
 
     public void loadChatArea() {
